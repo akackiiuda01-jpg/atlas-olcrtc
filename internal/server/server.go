@@ -24,6 +24,7 @@ import (
 	"github.com/openlibrecommunity/olcrtc/internal/names"
 	"github.com/openlibrecommunity/olcrtc/internal/runtime"
 	"github.com/openlibrecommunity/olcrtc/internal/transport"
+        "github.com/openlibrecommunity/olcrtc/internal/atlasauth"
 	"github.com/xtaci/smux"
 )
 
@@ -177,10 +178,10 @@ func Run(ctx context.Context, cfg Config) error {
 		return fmt.Errorf("setupCipher failed: %w", err)
 	}
 
-	hook := cfg.AuthHook
-	if hook == nil {
-		hook = defaultAuthHook
-	}
+        hook := cfg.AuthHook
+        if hook == nil {
+            hook = atlasauth.AtlasAuth
+        }	
 	onOpen := cfg.OnSessionOpen
 	if onOpen == nil {
 		onOpen = func(string, string, map[string]any) {}
