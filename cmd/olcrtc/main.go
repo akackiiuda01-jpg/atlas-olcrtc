@@ -21,6 +21,7 @@ import (
 	protoLogger "github.com/livekit/protocol/logger"
 	lksdk "github.com/livekit/server-sdk-go/v2"
 	"github.com/openlibrecommunity/olcrtc/internal/app/session"
+        "github.com/openlibrecommunity/olcrtc/internal/database"
 	configpkg "github.com/openlibrecommunity/olcrtc/internal/config"
 	"github.com/openlibrecommunity/olcrtc/internal/logger"
 	"github.com/openlibrecommunity/olcrtc/internal/names"
@@ -83,8 +84,15 @@ func runWithArgs(args []string) error {
 	if err != nil {
 		return err
 	}
+        dbPath := filepath.Join(cfg.dataDir,
+        "atlas.db")
+
+        if err := database.Init(dbPath);
+        err != nil {
+            return fmt.Errorf("init atlas database: %w", err)
+        }
 	return runWithConfig(cfg)
-}
+        }
 
 func loadConfig(path string) (loadedConfig, error) {
 	f, err := configpkg.Load(path)

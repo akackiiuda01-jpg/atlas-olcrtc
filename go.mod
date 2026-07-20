@@ -9,6 +9,7 @@ require (
 	github.com/livekit/protocol v1.46.0
 	github.com/livekit/server-sdk-go/v2 v2.16.4-0.20260522175902-00c9771fae5a
 	github.com/magefile/mage v1.17.2
+	github.com/mattn/go-sqlite3 v1.14.48
 	github.com/pion/ice/v4 v4.2.5
 	github.com/pion/interceptor v0.1.45
 	github.com/pion/logging v0.2.4

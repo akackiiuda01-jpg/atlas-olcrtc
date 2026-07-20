@@ -7,7 +7,15 @@ import (
 )
 
 func AtlasAuth(deviceID string, claims map[string]any) (string, error) {
-	log.Printf("[AtlasAuth] DeviceID=%s Claims=%v", deviceID, claims)
+	sessionID := uuid.NewString()
 
-	return uuid.NewString(), nil
+	log.Println("====================================")
+	log.Println(" AtlasAuth")
+	log.Println("====================================")
+	log.Printf("DeviceID : %s", deviceID)
+	log.Printf("Claims   : %#v", claims)
+	log.Printf("SessionID: %s", sessionID)
+	log.Println("====================================")
+
+	return sessionID, nil
 }
