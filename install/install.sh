@@ -1,36 +1,64 @@
 #!/bin/bash
 set -e
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO="akackiiuda01-jpg/atlas-olcrtc"
+BRANCH="atlas-core"
 
 echo "===================================="
 echo "      AtlasD Installer"
 echo "===================================="
 
 if [ "$EUID" -ne 0 ]; then
-    echo "Ошибка: запусти установщик от root."
+    echo "Запусти установщик от root."
     exit 1
 fi
 
-echo "[1/7] Создание каталогов..."
+echo "[1/8] Проверка системы..."
+command -v curl >/dev/null || {
+    apt update
+    apt install -y curl
+}
+
+echo "[2/8] Создание каталогов..."
 mkdir -p /etc/atlasd
 mkdir -p /var/lib/atlasd
 
-echo "[2/7] Установка бинарника..."
-install -m 755 "$SCRIPT_DIR/../atlasd" /usr/local/bin/atlasd
+echo "[3/8] Загрузка бинарника..."
+curl -L \
+https://raw.githubusercontent.com/$REPO/$BRANCH/atlasd \
+-o /usr/local/bin/atlasd
 
-echo "[3/7] Установка конфигурации..."
-if [ ! -f /etc/atlasd/config.yaml ]; then
-    cp "$SCRIPT_DIR/config.template" /etc/atlasd/config.yaml
-fi
+chmod +x /usr/local/bin/atlasd
 
-echo "[4/7] Установка systemd..."
-cp "$SCRIPT_DIR/atlasd.service" /etc/systemd/system/atlasd.service
+echo "[4/8] Загрузка конфигурации..."
+curl -L \
+https://raw.githubusercontent.com/$REPO/$BRANCH/install/config.template \
+-o /etc/atlasd/config.yaml
 
-echo "[5/7] Обновление systemd..."
+echo "[5/8] Загрузка systemd..."
+curl -L \
+https://raw.githubusercontent.com/$REPO/$BRANCH/install/atlasd.service \
+-o /etc/systemd/system/atlasd.service
+
+echo "[6/8] Обновление systemd..."
 systemctl daemon-reload
 
-echo "[6/7] Включение автозапуска..."
+echo "[7/8] Включение автозапуска..."
 systemctl enable atlasd
 
-echo "[7/7] Запуск сервиса..."
+echo "[8/8] Запуск..."
+systemctl restart atlasd
+
+echo
+echo "===================================="
+echo "AtlasD установлен."
+echo
+echo "Конфиг:"
+echo "  /etc/atlasd/config.yaml"
+echo
+echo "Проверка:"
+echo "  systemctl status atlasd"
+echo
+echo "Логи:"
+echo "  journalctl -u atlasd -f"
+echo "===================================="
