@@ -7,7 +7,7 @@ Wants=network-online.target
 Type=simple
 User=root
 WorkingDirectory=/etc/atlasd
-ExecStart=/usr/local/bin/atlasd -config /etc/atlasd/config.yaml
+ExecStart=/usr/local/bin/atlasd /etc/atlasd/config.yaml
 Restart=always
 RestartSec=3
 
