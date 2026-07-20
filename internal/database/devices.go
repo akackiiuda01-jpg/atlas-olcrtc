@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"time"
 )
 
 type Device struct {
@@ -37,4 +38,22 @@ func GetDevice(deviceID string) (*Device, error) {
 	d.Blocked = blocked != 0
 
 	return &d, nil
+}
+
+func (d *Device) SubscriptionActive() bool {
+
+	if d.Blocked {
+		return false
+	}
+
+	if d.ExpiresAt == "" {
+		return true
+	}
+
+	expireTime, err := time.Parse(time.RFC3339, d.ExpiresAt)
+	if err != nil {
+		return false
+	}
+
+	return time.Now().Before(expireTime)
 }

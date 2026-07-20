@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/openlibrecommunity/olcrtc/internal/atlasauth"
 	"github.com/openlibrecommunity/olcrtc/internal/control"
 	"github.com/openlibrecommunity/olcrtc/internal/crypto"
 	"github.com/openlibrecommunity/olcrtc/internal/framing"
@@ -24,7 +25,6 @@ import (
 	"github.com/openlibrecommunity/olcrtc/internal/names"
 	"github.com/openlibrecommunity/olcrtc/internal/runtime"
 	"github.com/openlibrecommunity/olcrtc/internal/transport"
-        "github.com/openlibrecommunity/olcrtc/internal/atlasauth"
 	"github.com/xtaci/smux"
 )
 
@@ -178,10 +178,10 @@ func Run(ctx context.Context, cfg Config) error {
 		return fmt.Errorf("setupCipher failed: %w", err)
 	}
 
-        hook := cfg.AuthHook
-        if hook == nil {
-            hook = atlasauth.AtlasAuth
-        }	
+	hook := cfg.AuthHook
+	if hook == nil {
+		hook = atlasauth.AtlasAuth
+	}
 	onOpen := cfg.OnSessionOpen
 	if onOpen == nil {
 		onOpen = func(string, string, map[string]any) {}
@@ -680,6 +680,35 @@ func (s *Server) removePeerSession(peerID, reason string) {
 	if ps != nil {
 		s.closePeerSession(ps, reason)
 	}
+
+}
+func (s *Server) disconnectDuplicateDevice(currentPeerID, deviceID string) {
+	if deviceID == "" {
+		return
+	}
+
+	var oldPeerID string
+
+	s.sessMu.Lock()
+	for peerID, ps := range s.peerSessions {
+		if peerID == currentPeerID {
+			continue
+		}
+		if ps != nil && ps.deviceID == deviceID {
+			oldPeerID = peerID
+			break
+		}
+	}
+	s.sessMu.Unlock()
+
+	if oldPeerID != "" {
+		logger.Infof(
+			"duplicate DeviceID detected (%s), closing previous peer %s",
+			deviceID,
+			oldPeerID,
+		)
+		s.removePeerSession(oldPeerID, "duplicate device login")
+	}
 }
 
 func (s *Server) closePeerSession(ps *peerSession, reason string) {
@@ -1050,6 +1079,7 @@ func (s *Server) acceptPeerHandshake(ctx context.Context, ps *peerSession) {
 		if ps.sessionReady != nil {
 			close(ps.sessionReady)
 		}
+                s.disconnectDuplicateDevice(ps.peerID, hello.DeviceID)
 		s.recordSession(sid)
 		s.onOpen(sid, hello.DeviceID, hello.Claims)
 		s.trackPeerOpen(sid, hello.DeviceID)
