@@ -1,0 +1,22 @@
+mode: srv
+
+debug: true
+
+auth:
+  provider: wbstream
+
+room:
+  id: "REPLACE_WITH_ROOM_ID"
+
+crypto:
+  key: "REPLACE_WITH_CRYPTO_KEY"
+
+net:
+  transport: vp8channel
+  dns: "1.1.1.1:53"
+
+vp8:
+  fps: 60
+  batch_size: 64
+
+data: /var/lib/atlasd
