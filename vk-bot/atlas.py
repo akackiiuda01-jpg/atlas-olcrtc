@@ -1,15 +1,16 @@
 import yaml
 import subprocess
-from config import CONFIG_FILE, SERVICE_NAME
+
+from config import ATLAS_CONFIG, ATLAS_SERVICE
 
 
 def load_config():
-    with open(CONFIG_FILE, "r") as f:
+    with open(ATLAS_CONFIG, "r") as f:
         return yaml.safe_load(f)
 
 
 def save_config(cfg):
-    with open(CONFIG_FILE, "w") as f:
+    with open(ATLAS_CONFIG, "w") as f:
         yaml.safe_dump(cfg, f, default_flow_style=False, sort_keys=False)
 
 
@@ -25,13 +26,11 @@ def get_room():
 
 def set_room(room_id):
     cfg = load_config()
-
     cfg["room"]["id"] = room_id
-
     save_config(cfg)
 
     subprocess.run(
-        ["systemctl", "restart", SERVICE_NAME],
+        ["systemctl", "restart", ATLAS_SERVICE],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
@@ -39,7 +38,7 @@ def set_room(room_id):
 
 def status():
     result = subprocess.run(
-        ["systemctl", "is-active", SERVICE_NAME],
+        ["systemctl", "is-active", ATLAS_SERVICE],
         capture_output=True,
         text=True,
     )
