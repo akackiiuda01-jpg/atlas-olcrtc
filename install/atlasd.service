@@ -1,12 +1,14 @@
 [Unit]
-Description=AtlasD
+Description=AtlasD Server
 After=network.target
 
 [Service]
 Type=simple
 ExecStart=/usr/local/bin/atlasd /etc/atlasd/config.yaml
 Restart=always
-RestartSec=5
+RestartSec=3
+User=root
+WorkingDirectory=/var/lib/atlasd
 
 [Install]
 WantedBy=multi-user.target
