@@ -32,7 +32,7 @@ chmod +x /usr/local/bin/atlasd
 
 echo "[4/8] Загрузка конфигурации..."
 curl -L \
-https://raw.githubusercontent.com/$REPO/$BRANCH/install/config.template \
+https://raw.githubusercontent.com/$REPO/$BRANCH/install/config.yaml
 -o /etc/atlasd/config.yaml
 
 echo "[5/8] Загрузка systemd..."
