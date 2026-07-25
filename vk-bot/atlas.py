@@ -26,7 +26,9 @@ def get_room():
 
 def set_room(room_id):
     cfg = load_config()
+
     cfg["room"]["id"] = room_id
+
     save_config(cfg)
 
     subprocess.run(
