@@ -24,21 +24,18 @@ mkdir -p /etc/atlasd
 mkdir -p /var/lib/atlasd
 
 echo "[3/8] Загрузка бинарника..."
-curl -L \
-https://raw.githubusercontent.com/$REPO/$BRANCH/atlasd \
--o /usr/local/bin/atlasd
+curl -L "https://raw.githubusercontent.com/$REPO/$BRANCH/atlasd" \
+    -o /usr/local/bin/atlasd
 
 chmod +x /usr/local/bin/atlasd
 
 echo "[4/8] Загрузка конфигурации..."
-curl -L \
-https://raw.githubusercontent.com/$REPO/$BRANCH/install/config.yaml
--o /etc/atlasd/config.yaml
+curl -L "https://raw.githubusercontent.com/$REPO/$BRANCH/install/config.yaml" \
+    -o /etc/atlasd/config.yaml
 
 echo "[5/8] Загрузка systemd..."
-curl -L \
-https://raw.githubusercontent.com/$REPO/$BRANCH/install/atlasd.service \
--o /etc/systemd/system/atlasd.service
+curl -L "https://raw.githubusercontent.com/$REPO/$BRANCH/install/atlasd.service" \
+    -o /etc/systemd/system/atlasd.service
 
 echo "[6/8] Обновление systemd..."
 systemctl daemon-reload
