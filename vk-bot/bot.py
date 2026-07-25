@@ -8,7 +8,7 @@ import atlas
 waiting_room = False
 
 
-def keyboard():
+def build_keyboard():
     kb = VkKeyboard(one_time=False)
 
     kb.add_button("🔑 Показать ключ", color=VkKeyboardColor.PRIMARY)
@@ -22,7 +22,6 @@ def keyboard():
 
 vk_session = vk_api.VkApi(token=VK_TOKEN)
 vk = vk_session.get_api()
-
 longpoll = VkLongPoll(vk_session)
 
 print("Atlas VK Bot started")
@@ -40,26 +39,27 @@ for event in longpoll.listen():
 
     text = event.text.strip()
 
-    
-    if waiting_room:
+    global_wait = waiting_room
+
+    if global_wait:
         atlas.set_room(text)
 
+        waiting_room = False
+
         vk.messages.send(
             user_id=event.user_id,
             random_id=0,
-            message="✅ Room ID изменён.\nAtlas перезапущен."
+            message="✅ Room ID сохранён.\nAtlasD перезапущен."
         )
-
-        waiting_room = False
         continue
 
-    if text.lower() in ["меню", "start", "/start"]:
+    if text.lower() in ("/start", "start", "меню"):
 
         vk.messages.send(
             user_id=event.user_id,
             random_id=0,
-            message="Atlas Core",
-            keyboard=keyboard()
+            message="Atlas Control Panel",
+            keyboard=build_keyboard()
         )
 
     elif text == "🔑 Показать ключ":
@@ -72,12 +72,10 @@ for event in longpoll.listen():
 
     elif text == "📊 Состояние Atlas":
 
-        status = atlas.status()
-
         vk.messages.send(
             user_id=event.user_id,
             random_id=0,
-            message=f"Статус: {status}"
+            message=f"Статус: {atlas.status()}"
         )
 
     elif text == "🆔 Изменить Room ID":
