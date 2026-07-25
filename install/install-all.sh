@@ -15,10 +15,15 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 echo "[1/12] Проверка системы..."
-command -v curl >/dev/null || { apt update && apt install -y curl; }
-command -v python3 >/dev/null || { apt update && apt install -y python3; }
-python3 -m venv --help >/dev/null 2>&1 || apt install -y python3-venv
-command -v openssl >/dev/null || apt install -y openssl
+apt-get update -y
+apt-get install -y curl python3 python3-venv python3-pip openssl
+
+if ! python3 -m venv /tmp/atlas-venv-check >/dev/null 2>&1; then
+    PYVER=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
+    echo "  python3-venv неполный, доустанавливаю python${PYVER}-venv..."
+    apt-get install -y "python${PYVER}-venv"
+fi
+rm -rf /tmp/atlas-venv-check
 
 echo "[2/12] Создание каталогов..."
 mkdir -p /etc/atlasd /var/lib/atlasd /opt/atlas-vk-bot
