@@ -1,0 +1,20 @@
+mode: srv
+
+auth:
+  provider: wbstream
+
+room:
+  id: ""
+
+crypto:
+  key: ""
+
+net:
+  transport: vp8channel
+  dns: "1.1.1.1:53"
+
+vp8:
+  fps: 60
+  batch_size: 64
+
+data: /var/lib/atlasd
